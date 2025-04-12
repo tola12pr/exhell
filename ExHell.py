@@ -1,5 +1,7 @@
 import os
 
+import re
+
 
 import threading
 
@@ -8,9 +10,6 @@ from sys import executable
 
 
 from sqlite3 import connect as sql_connect
-
-
-import re
 
 
 from base64 import b64decode
