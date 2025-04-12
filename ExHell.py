@@ -1,4 +1,4 @@
-         avatar = import os
+import os
 
 
 import threading
